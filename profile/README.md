@@ -60,13 +60,9 @@ RX64는 MIT의 교육용 운영체제 xv6-riscv를 x86-64로 두 번 포팅했�
 
 ## 시연 영상
 
-<!-- 영상 업로드 후 VIDEO_ID를 바꾸고 이 주석을 지우세요.
-<a href="https://youtu.be/VIDEO_ID">
-<img src="https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg" alt="RX64 시연 영상" width="640">
+<a href="https://youtu.be/5DVOjNpzoSY">
+<img src="https://img.youtube.com/vi/5DVOjNpzoSY/maxresdefault.jpg" alt="RX64 시연 영상" width="640">
 </a>
--->
-
-> 준비 중입니다.
 
 ---
 
@@ -111,7 +107,29 @@ RX64는 MIT의 교육용 운영체제 xv6-riscv를 x86-64로 두 번 포팅했�
 
 ## 빠른 시작
 
-Docker(BuildKit 포함)만 있으면 됩니다. Ubuntu의 `docker.io` 패키지를 쓴다면 `docker-buildx`도 설치해야 합니다(`sudo apt install docker-buildx`).
+Ubuntu 24.04(메모리 8GB, CPU 6개)에서 확인한 순서입니다. 디스크는 Docker 이미지와 기록을 합쳐 10GB 정도 여유가 있어야 합니다.
+
+### 1. 필요한 프로그램 설치 (처음 한 번)
+
+```sh
+sudo apt update
+sudo apt install -y git docker.io docker-buildx
+```
+
+### 2. sudo 없이 docker를 쓰도록 설정 (처음 한 번)
+
+```sh
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+`newgrp docker`는 지금 연 터미널에만 설정을 바로 적용합니다. 다른 터미널에서도 쓰려면 로그아웃 후 다시 로그인하세요. 아래 명령에서 `permission denied`가 나오지 않으면 됩니다.
+
+```sh
+docker info
+```
+
+### 3. 받아서 빌드하고 실행
 
 ```sh
 git clone --recurse-submodules https://github.com/Dankook-Software-Distribution/rx64-viz.git
@@ -120,6 +138,34 @@ docker build -t rxviz .
 docker run --rm -p 127.0.0.1:8080:8080 -v "$PWD/runs/data:/data" rxviz
 ```
 
-http://localhost:8080 을 열고 Console에 `echo hi`, `lazytouch`(페이지 폴트 3번), `pipewait`(파이프 sleep/wakeup)를 입력해 보세요. 첫 실행 때는 두 커널의 부팅을 기록하고 인덱싱하느라 10분 안팎이 걸리고(컴퓨터 성능에 따라 다름), 그동안에도 셸은 쓸 수 있습니다. 다음 실행부터는 1분 안쪽입니다.
+- `--recurse-submodules`를 빠뜨리면 커널 소스(`os/`)가 비어서 빌드가 실패합니다.
+- 빌드는 처음에 시간이 꽤 걸립니다(이미지와 의존성 다운로드, 컴파일).
+- 첫 실행 때는 두 커널의 부팅을 기록하고 인덱싱하느라 10분 안팎이 걸립니다(컴퓨터 성능에 따라 다름). 그동안에도 셸은 쓸 수 있습니다.
 
-커널만 실행하려면 각 커널 레포에서 `make qemu`를 실행합니다(x86-64 gcc와 QEMU 7.2 이상 필요).
+### 4. 브라우저에서 열기
+
+http://localhost:8080 을 열고 Console에 `echo hi`, `lazytouch`(페이지 폴트 3번), `pipewait`(파이프 sleep/wakeup)를 입력해 보세요. 브라우저를 닫아도 서버는 계속 돌아갑니다.
+
+### 5. 끄기와 다시 켜기
+
+- **끄기**: 서버를 띄운 터미널에서 `Ctrl+C`. 그 터미널 창을 닫아도 꺼집니다.
+- **다시 켜기**: 빌드는 다시 할 필요 없습니다. 부팅 기록이 `runs/data`에 남아 있어서 1분 안쪽으로 뜹니다.
+
+  ```sh
+  cd rx64-viz
+  docker run --rm -p 127.0.0.1:8080:8080 -v "$PWD/runs/data:/data" rxviz
+  ```
+- **xv6만 재부팅**: 웹 화면 위쪽 커널 선택 상자 옆의 ↻ 버튼. 서버는 그대로 둡니다.
+
+### 6. 처음 상태로 지우기
+
+`runs/data`는 Docker가 만든 폴더라서 `sudo`가 있어야 지워집니다.
+
+```sh
+sudo rm -rf rx64-viz
+docker rmi rxviz
+```
+
+### 커널만 실행하기
+
+각 커널 레포에서 `make qemu`를 실행합니다(x86-64 gcc와 QEMU 7.2 이상 필요).
