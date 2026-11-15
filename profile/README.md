@@ -56,6 +56,12 @@ RX64는 MIT의 교육용 운영체제 xv6-riscv를 x86-64로 두 번 포팅했�
 
 그리고 교과서의 그림이 아니라 **커널이 실제로 한 일**을 보여 주기 위해 rx64-viz를 만들었습니다. xv6 셸에 명령을 입력하면 QEMU 플러그인이 커널과 유저 프로그램이 실행한 모든 명령어(바뀐 레지스터, 메모리 쓰기, 인터럽트)를 기록하고, 브라우저에서 그 기록을 C 소스 줄 단위로 앞뒤로 이동하며 레지스터 · 스택 · 페이지 테이블 · 프로세스 테이블 · 시스템 콜을 확인할 수 있습니다. 화면에 나오는 값은 모두 실제로 기록된 값입니다.
 
+### 왜 만들었나요?
+
+- 운영체제 수업에서 트랩, 페이지 테이블 전환, 문맥 교환은 대부분 그림으로만 배웁니다.
+- 디버거로 커널을 따라가 보려 해도, 트랩 진입이나 CR3 전환처럼 순식간에 지나가는 순간은 붙잡기 어렵고 되돌아갈 수도 없습니다.
+- 같은 커널이 설계에 따라 어떻게 달라지는지 같은 조건에서 비교해 볼 자료가 없습니다.
+
 ---
 
 ## 시연 영상
@@ -102,6 +108,19 @@ RX64는 MIT의 교육용 운영체제 xv6-riscv를 x86-64로 두 번 포팅했�
 | **Memory** | CR3 주소 공간, 가상 주소 하나의 4단계 page walk, 물리 프레임 전체의 용도(실제 `kmem.freelist` 기준) |
 | **Timeline · Processes** | 스레드별 실행 구간, sleep/runnable 상태와 wakeup, 프로세스 테이블 |
 | **Stack · Variables · CPU** | 슬롯별 스택(trapframe 필드와 누가 썼는지), DWARF 기반 지역 변수, GDT/TSS/IDT |
+
+### 동작 방식
+
+```mermaid
+flowchart LR
+  A["브라우저 Console<br/>명령 입력"] --> B["QEMU (-icount)<br/>+ 트레이스 플러그인"]
+  B --> C["기록<br/>명령어·레지스터·메모리 쓰기"]
+  C --> D["인덱서<br/>(Spring Boot)"]
+  D --> E["REST / WebSocket"]
+  E --> F["웹 UI<br/>Code · Memory · Stack · Syscalls …"]
+```
+
+셸에 명령을 입력하면 서버가 기록을 시작하고, 다음 프롬프트가 뜨면 기록을 끝내고 인덱싱합니다. QEMU를 `-icount`로 실행해서 기록하는 오버헤드가 게스트의 타이밍을 바꾸지 않습니다.
 
 ---
 
@@ -169,3 +188,28 @@ docker rmi rxviz
 ### 커널만 실행하기
 
 각 커널 레포에서 `make qemu`를 실행합니다(x86-64 gcc와 QEMU 7.2 이상 필요).
+
+---
+
+## 검증
+
+Ubuntu 24.04에서 확인했습니다.
+
+| 대상 | 방법 | 결과 |
+|---|---|---|
+| rx64-x86-style, rx64-riscv-style | xv6 `usertests` 전체 | 두 커널 모두 ALL TESTS PASSED |
+| rx64-viz | `server/e2e/e2e.py`, `boot.py`, `ws.mjs` | 모두 통과 |
+
+---
+
+## 한계
+
+- 산술 플래그(CF, ZF 등)는 기록되지 않습니다. QEMU가 플러그인에 넘겨 주지 않아서 eflags는 시스템 플래그만 보입니다.
+- 페이지 테이블 항목의 A(accessed), D(dirty) 비트는 MMU가 직접 쓰는 값이라 기록에 남지 않아 "알 수 없음"으로 표시됩니다.
+- 실행 환경은 Ubuntu에서만 확인했습니다. Windows와 macOS에서는 아직 확인하지 않았습니다.
+
+---
+
+## 출처
+
+두 커널은 MIT PDOS의 [xv6-riscv](https://github.com/mit-pdos/xv6-riscv)를 바탕으로 했습니다. xv6는 MIT 라이선스이며, 저작권은 Frans Kaashoek, Robert Morris, Russ Cox, Massachusetts Institute of Technology에 있습니다. 원본은 두 커널 레포의 `riscv` 브랜치에 그대로 남아 있습니다.
