@@ -30,19 +30,19 @@
   <td align="center" nowrap>김보겸 (팀장)</td>
   <td align="center">32210**7</td>
   <td align="center"><a href="https://github.com/bogamie">@bogamie</a></td>
-  <td><b>rx64-x86-style</b> 전체: Higher-half 커널 · 스케줄러와 타이머 선점 · 유저 페이지 테이블 · <code>int $64</code> 유저 모드 진입/복귀 · lazy 유저 페이지 · SMP 부팅 · q35 + virtio-blk-pci 디스크<br><b>rx64-viz</b> 전체: QEMU TCG 트레이스 플러그인 · Spring Boot 인덱서/서버 · 웹 UI</td>
+  <td><b>rx64-x86-style</b> 전체: Higher-half 커널 · 스케줄러와 타이머 선점 · 유저 페이지 테이블 · <code>int $64</code> 유저 모드 진입/복귀 · lazy 유저 페이지 · SMP 부팅 · q35 + virtio-blk-pci 디스크<br><b>rx64-viz</b> 서버: Spring Boot 서버 · QEMU 실행과 세션 관리 · REST/WebSocket API</td>
 </tr>
 <tr>
   <td align="center" nowrap>최승원</td>
   <td align="center">32214**2</td>
   <td align="center"><a href="https://github.com/SeungwonChoi-kr">@SeungwonChoi-kr</a></td>
-  <td><b>rx64-riscv-style</b>: 부트(PVH 진입 · long mode 전환 · 링커 스크립트 · Makefile) · UART(포트 I/O) · LAPIC 타이머와 IOAPIC 인터럽트 · PCI와 virtio-pci 디스크 드라이버 · 유저 모드(trampoline <code>uservec</code>/<code>userret</code> · <code>swapgs</code> · CPUENTRY의 GDT/TSS/유저 IDT) · 시스템 콜 ABI와 trapframe · usertests x86 주소 조정 · 소스 구조 정리 · riscv↔x86 대응 문서</td>
+  <td><b>rx64-riscv-style</b>: 부트(PVH 진입 · long mode 전환 · 링커 스크립트 · Makefile) · UART(포트 I/O) · LAPIC 타이머와 IOAPIC 인터럽트 · PCI와 virtio-pci 디스크 드라이버 · 유저 모드(trampoline <code>uservec</code>/<code>userret</code> · <code>swapgs</code> · CPUENTRY의 GDT/TSS/유저 IDT) · 시스템 콜 ABI와 trapframe · usertests x86 주소 조정 · 소스 구조 정리 · riscv↔x86 대응 문서<br><b>rx64-viz</b> 커널 상태 해석 · UI: ELF/DWARF 해석(심볼 · 소스 줄 · 변수 · 구조체) · 주소 공간과 page walk 해석 · UI 화면 설계와 검토 · end-to-end 테스트</td>
 </tr>
 <tr>
   <td align="center" nowrap>안태현</td>
   <td align="center">32212**8</td>
   <td align="center"><a href="https://github.com/Kcits970">@Kcits970</a></td>
-  <td><b>rx64-riscv-style</b>: 4단계 페이징(<code>vm.c</code> · CR3 · NX) · 커널 트랩(IDT · CPU별 GDT/TSS · IST · <code>kernelvec</code>) · 컨텍스트 스위치(<code>swtch.S</code> · GS base로 <code>cpuid</code>/<code>mycpu</code>) · SMP(APENTRY · INIT/SIPI로 AP 기동) · PR 리뷰</td>
+  <td><b>rx64-riscv-style</b>: 4단계 페이징(<code>vm.c</code> · CR3 · NX) · 커널 트랩(IDT · CPU별 GDT/TSS · IST · <code>kernelvec</code>) · 컨텍스트 스위치(<code>swtch.S</code> · GS base로 <code>cpuid</code>/<code>mycpu</code>) · SMP(APENTRY · INIT/SIPI로 AP 기동) · PR 리뷰<br><b>rx64-viz</b> 실행 기록 · 인덱싱: QEMU TCG 트레이스 플러그인(rxtrace) · 인덱서(chunk · 메모리 checkpoint · event tree)</td>
 </tr>
 </table>
 
@@ -69,6 +69,15 @@ RX64는 MIT의 교육용 운영체제 xv6-riscv를 x86-64로 두 번 포팅했�
 <a href="https://youtu.be/5DVOjNpzoSY">
 <img src="https://img.youtube.com/vi/5DVOjNpzoSY/maxresdefault.jpg" alt="RX64 시연 영상" width="640">
 </a>
+
+---
+
+## 결과보고서 · 포스터
+
+| 자료 | 내용 |
+|---|---|
+| [결과보고서 (PDF)](https://github.com/Dankook-Software-Distribution/.github/blob/main/docs/RX64-report.pdf) | 설계, 구현, 검증, 한계 (28쪽) |
+| [포스터 (PDF)](https://github.com/Dankook-Software-Distribution/.github/blob/main/docs/RX64-poster.pdf) | 프로젝트 한 장 요약 |
 
 ---
 
